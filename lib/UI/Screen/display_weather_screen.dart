@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forecasters/Helper/app_constants.dart';
+import 'package:forecasters/Model/favorite.dart';
+import 'package:forecasters/UI/Controller/favorite_controller.dart';
 import 'package:forecasters/UI/Controller/weather_controller.dart';
 import 'package:forecasters/UI/Screen/splash_screen.dart';
 import 'package:forecasters/UI/Widget/display_weather_cards.dart';
@@ -7,10 +9,17 @@ import 'package:forecasters/UI/Widget/weather_prediction.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
-class DisplayWeatherScreen extends StatelessWidget {
-  DisplayWeatherScreen({super.key});
+class DisplayWeatherScreen extends StatefulWidget {
+  const DisplayWeatherScreen({super.key});
 
+  @override
+  State<DisplayWeatherScreen> createState() => _DisplayWeatherScreenState();
+}
+
+class _DisplayWeatherScreenState extends State<DisplayWeatherScreen> {
   final WeatherController weatherController = Get.find();
+
+  final FavoriteController favoriteController = Get.put(FavoriteController());
 
   @override
   Widget build(BuildContext context) {
@@ -202,12 +211,12 @@ class DisplayWeatherScreen extends StatelessWidget {
                           title: 'Sunset',
                           subtitle: 'Sunset Time',
                           value: DateFormat.jm().format(weatherController
-                              .weather
-                              .value
-                              .timelines
-                              .daily[0]
-                              .values
-                              .sunsetTime ??
+                                  .weather
+                                  .value
+                                  .timelines
+                                  .daily[0]
+                                  .values
+                                  .sunsetTime ??
                               DateTime.now()),
                           imgPath: AppConstants.imgSunset,
                         ),
@@ -217,6 +226,37 @@ class DisplayWeatherScreen extends StatelessWidget {
                 ),
               ),
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          if (favoriteController.favorites.isEmpty) {
+            favoriteController.favorites.add(Favorite(
+              lat: weatherController.weather.value.location.lat,
+              long: weatherController.weather.value.location.lon,
+              isFavorite: true,
+            ));
+            favoriteController.update();
+          }
+          if (favoriteController
+                  .favorites[favoriteController.favorites.length - 1].lat ==
+              weatherController.weather.value.location.lat) {
+            favoriteController
+                    .favorites[favoriteController.favorites.length - 1]
+                    .isFavorite =
+                !favoriteController
+                    .favorites[favoriteController.favorites.length - 1]
+                    .isFavorite;
+          }
+          favoriteController.update();
+          setState(() {});
+        },
+        child: favoriteController.favorites.isEmpty
+            ? const Icon(Icons.favorite_border)
+            : favoriteController
+                    .favorites[favoriteController.favorites.length - 1]
+                    .isFavorite
+                ? const Icon(Icons.favorite)
+                : const Icon(Icons.favorite_border),
+      ),
     );
   }
 }

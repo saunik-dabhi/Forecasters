@@ -33,4 +33,5 @@ class AppConstants {
   static const String baseUrl =
       'https://api.tomorrow.io/v4/weather/forecast?location=';
   static const String apiKey = '&apikey=2WDjvQhforSF50mHbi6Ud3xC1qS2o0Lk';
+  static const String mapsApiKey = 'AIzaSyCXiM_WwJQRjQ-0b2OVUBs1vZzTPp_c9A4';
 }
